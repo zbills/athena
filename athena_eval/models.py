@@ -1,26 +1,26 @@
 """Model wrappers for OpenAI and HuggingFace models."""
 
 from __future__ import annotations
-
 from dataclasses import dataclass
 import os
 import random
 from typing import Optional
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
-
+from .proxy_model_interface import OpenAIProxyModelInterface
+from .restapi_model import OpenAIModelInterface
 from .utils import load_api_key
 from dotenv import load_dotenv
-
 try:  # Optional dependency used only for OpenAI models
     from openai import OpenAI
 except Exception:  # pragma: no cover - library might not be installed during tests
     OpenAI = None  # type: ignore
-
+'''
 try:  # Optional dependency for HuggingFace models
     from transformers import pipeline
 except Exception:  # pragma: no cover
     pipeline = None  # type: ignore
+'''
 
 try:  # Optional dependency for Google Gemini models
     import google.generativeai as genai
@@ -44,12 +44,10 @@ class BaseModel:
 class OpenAIModel(BaseModel):
     """Wrapper for OpenAI chat and responses APIs."""
 
-    def __init__(self, name: str, api_key: Optional[str] = None):
-        super().__init__(name)
-        if OpenAI is None:
-            raise ImportError("openai package is required for OpenAIModel")
-        api_key = api_key or load_api_key("OPENAI_API_KEY")
-        self.client = OpenAI(api_key=api_key)
+    def __init__(self, name: str, endpoint_url: Optional[str] = None):
+        self.name = name
+        self.client = OpenAIModelInterface(endpoint_url=endpoint_url)
+        #self.client = OpenAIProxyModelInterface("bus:snap:orngcresco/twapi/mini/e/dam/20260103/dam/mini-polish-test-aux-mainrun-v7-2026-01-03-16-26_iter1_dfa-3334/model:user:haijunz$harmony_v4.0.16_1mil_orion_orion_200k_no_asr_32k_action_lpe")
 
     def generate(self, prompt: str, temperature: float = 0.0, **_: object) -> str:
         if self.name.startswith("gpt-5"):
@@ -68,17 +66,18 @@ class OpenAIModel(BaseModel):
             )
             return (getattr(resp, "output_text", "") or "").strip()
         else:
-            resp = self.client.chat.completions.create(
-                model=self.name,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=temperature,
-            )
-            return resp.choices[0].message.content.strip()
+            try:
+                return self.client.generate_response_for_prompt(prompt).strip()
+            except Exception as e:
+                print(f"===========Error in OpenAIModel.generate=============: {e}")
 
-
+                if "No content found in model response" in str(e):
+                    return "NO RESPONSE"
+                else:
+                    raise e
+                
 class GeminiModel(BaseModel):
     """Wrapper for Google Gemini models."""
-
     def __init__(self, name: str, api_key: Optional[str] = None):
         super().__init__(name)
         if genai is None:
@@ -199,8 +198,9 @@ class HuggingFaceModel(BaseModel):
 def load_model(cfg: dict) -> BaseModel:
     mtype = cfg.get("type")
     name = cfg.get("name") or cfg.get("model")
+    print(f"[load_model] Loading model type={mtype} name={name}")  # IGNORE
     if mtype in {"openai", "chatgpt"}:
-        return OpenAIModel(name, api_key=cfg.get("api_key"))
+        return OpenAIModel(name, endpoint_url=cfg.get("endpoint_url"))
     if mtype in {"hf", "huggingface"}:
         return HuggingFaceModel(name, max_new_tokens=cfg.get("max_new_tokens", 2048), api_key=cfg.get("api_key"))
     if mtype in {"gemini", "google"}:

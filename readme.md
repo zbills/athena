@@ -24,26 +24,27 @@ AthenaBench provides cybersecurity benchmarking tasks for evaluating language mo
 ## Run the Benchmark
 
 ### Full datasets
+NOTE: '--model' used to tag different output
 Generate predictions on the full benchmark (writes to `runs/<model>/<task>.jsonl`):
 ```bash
-python -m athena_eval.run --model gpt-4o --task RCM
+ython -m athena_eval.run --model gpt-41-mini --rounds 1 --endpoint_url http://10.130.47.230:8433/openai/deployments/{deployment}/chat/completions --task RCM
 ```
-- Omit `--model` or `--task` to iterate over all configured entries.
+- Omit `--task` to iterate over all tasks.
 - Evaluation runs by default; add `--no-evaluate` to skip scoring during generation.
 
 Re-evaluate existing predictions:
 ```bash
-python -m athena_eval.evaluate --model gpt-4o --task RCM
+python -m athena_eval.evaluate --model gpt-41-mini --task RCM
 ```
 - `CKT` uses `benchmark/athena-cti-ckt-3k.jsonl` (3k-set available; no full CKT file in this repo). If an unscored file is missing, the evaluator will fall back to the existing `*-scored.jsonl` for metrics without rewriting.
 
 ### Mini subsets
 Use the lightweight mini splits (writes to `runs-mini/<model>/<task>.jsonl`):
 ```bash
-python -m athena_eval.run --mini --model gpt-4o --task RCM
+python -m athena_eval.run --mini --model gpt-41-mini --task RCM
 ```
 ```bash
-python -m athena_eval.evaluate --mini --model gpt-4o --task RCM
+python -m athena_eval.evaluate --mini --model gpt-41-mini --task RCM
 ```
 - The `--mini` flag swaps each dataset path for its counterpart in `benchmark-mini/`. Evaluator will read from `runs-mini/` if present; otherwise it maps full-run outputs to the mini records by `prompt_hash`. As with full runs, if only scored artifacts exist, metrics are computed from `*-scored.jsonl` without rewriting.
 

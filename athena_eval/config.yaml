@@ -1,4 +1,16 @@
 models:
+  gpt-41-mini_0:
+    type: openai
+    name: gpt-41-mini_0
+  gpt-41-mini_1:
+    type: openai
+    name: gpt-41-mini_1
+  gpt-41-mini_2:
+    type: openai
+    name: gpt-41-mini_2
+  gpt-41-mini:
+    type: openai
+    name: gpt-41-mini
   gpt-4o:
     type: openai
     name: gpt-4o

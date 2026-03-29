@@ -336,6 +336,7 @@ def main(argv: Iterable[str] | None = None) -> None:
         avg_entries: List[Tuple[str, float]] = []
         avg_display: Dict[str, float] = {}
 
+        print(f"Evaluating model: {model_name}")
         def emit_metrics(task_key: str, metrics: Dict[str, float]) -> None:
             display_metrics = {
                 k: (f"{float(v):.4f}" if isinstance(v, (int, float)) else v)
@@ -350,7 +351,7 @@ def main(argv: Iterable[str] | None = None) -> None:
                 if value is not None:
                     avg_entries.append((task_key, value))
                     avg_display[task_upper] = value
-
+        print(task_names)
         for t in task_names:
             model_dir = pred_dir / model_name
             preds_path = model_dir / f"{t}.jsonl"
