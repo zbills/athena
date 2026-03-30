@@ -14,12 +14,6 @@ AthenaBench provides cybersecurity benchmarking tasks for evaluating language mo
    ```
    Git LFS is required to fetch the large benchmark artifacts.
 
-2. **Configure models and credentials** in `athena_eval/config.yaml`. Each entry specifies a provider (`openai`, `gemini`, `huggingface`, or `dummy`) and model name. API keys can be placed in the environment or a `.env` file that is auto-loaded. Example:
-   ```
-   OPENAI_API_KEY=""
-   GEMINI_API_KEY=""
-   HF_TOKEN=""
-   ```
 
 ## Run the Benchmark
 
