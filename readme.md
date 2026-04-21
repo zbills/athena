@@ -21,7 +21,13 @@ AthenaBench provides cybersecurity benchmarking tasks for evaluating language mo
 NOTE: '--model' used to tag different output
 Generate predictions on the full benchmark (writes to `runs/<model>/<task>.jsonl`):
 ```bash
-ython -m athena_eval.run --model gpt-41-mini --rounds 1 --endpoint_url http://10.130.47.230:8433/openai/deployments/{deployment}/chat/completions --task RCM
+python -m athena_eval.run --model gpt-41-mini --rounds 1 --endpoint_url http://10.130.47.230:8433/openai/deployments/{deployment}/chat/completions --task RCM
+
+```
+
+or 
+```
+python -m athena_eval.run --model gpt-41-mini --rounds 1 --use-proxy --task RCM
 ```
 - Omit `--task` to iterate over all tasks.
 - Evaluation runs by default; add `--no-evaluate` to skip scoring during generation.
