@@ -44,10 +44,12 @@ class BaseModel:
 class OpenAIModel(BaseModel):
     """Wrapper for OpenAI chat and responses APIs."""
 
-    def __init__(self, name: str, endpoint_url: Optional[str] = None):
+    def __init__(self, name: str, endpoint_url: Optional[str] = None, using_proxy: bool = False):
         self.name = name
-        self.client = OpenAIModelInterface(endpoint_url=endpoint_url)
-        #self.client = OpenAIProxyModelInterface("bus:snap:orngcresco/twapi/mini/e/dam/20260103/dam/mini-polish-test-aux-mainrun-v7-2026-01-03-16-26_iter1_dfa-3334/model:user:haijunz$harmony_v4.0.16_1mil_orion_orion_200k_no_asr_32k_action_lpe")
+        if using_proxy:
+            self.client = OpenAIProxyModelInterface(model_path=os.environ.get("BUS_MODEL"))
+        else:
+            self.client = OpenAIModelInterface(endpoint_url=endpoint_url)
 
     def generate(self, prompt: str, temperature: float = 0.0, **_: object) -> str:
         if self.name.startswith("gpt-5"):
@@ -200,7 +202,7 @@ def load_model(cfg: dict) -> BaseModel:
     name = cfg.get("name") or cfg.get("model")
     print(f"[load_model] Loading model type={mtype} name={name}")  # IGNORE
     if mtype in {"openai", "chatgpt"}:
-        return OpenAIModel(name, endpoint_url=cfg.get("endpoint_url"))
+        return OpenAIModel(name, endpoint_url=cfg.get("endpoint_url"), using_proxy=cfg.get("use_proxy", False))
     if mtype in {"hf", "huggingface"}:
         return HuggingFaceModel(name, max_new_tokens=cfg.get("max_new_tokens", 2048), api_key=cfg.get("api_key"))
     if mtype in {"gemini", "google"}:

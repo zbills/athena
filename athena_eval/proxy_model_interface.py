@@ -34,8 +34,8 @@ class OpenAIProxyModelInterface():
     def __init__(
         self,
         model_path: str,
-        max_tokens: int = 500,
-        temperature: float = 0.1,
+        max_tokens: int = 16000,
+        temperature: float = 1.0,
         timeout: int = 300
     ):
         """
@@ -202,6 +202,7 @@ class OpenAIProxyModelInterface():
                     "presence_penalty": 0,
                     "parallel_tool_calls": False,
                 }
+                #print(f"[generate_response_for_prompt_string] payload: {payload}")
                 inference_endpoint = f"https://openai-proxy.int.prod-southcentralus-hpe-2.dev.openai.org/v1/chat/completions"
                 # Make request
                 response = requests.post(
@@ -211,7 +212,7 @@ class OpenAIProxyModelInterface():
                     verify=False,
                     timeout=self.timeout
                 )
-                
+                print(f'response: {response.status_code}, {response.text}')
                 if response.status_code != 200:
                     logger.error(f"API request failed with status {response.status_code}: {response.text}")
                     raise RuntimeError(f"OpenAI proxy request failed: {response.status_code}")

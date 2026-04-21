@@ -236,6 +236,7 @@ def main(argv: Iterable[str] | None = None) -> None:
     parser.add_argument("--rounds", help="rounds to run", default=3)
     parser.add_argument("--workers", help="number of workers", default=10, type=int)
     parser.add_argument("--endpoint_url", help="OpenAI endpoint URL", default=None)
+    parser.add_argument("--use_proxy", help="Use OpenAI proxy model", action="store_true", default=False)
 
     parser.add_argument(
         "--evaluate",
@@ -297,6 +298,7 @@ def main(argv: Iterable[str] | None = None) -> None:
         endpoint_url = args.endpoint_url or model_cfg.get("endpoint_url")
         model_cfg["endpoint_url"] = endpoint_url  # Ensure the model config has the endpoint
         model_cfg['workers'] = args.workers
+        model_cfg['use_proxy'] = args.use_proxy
 
         for t in task_names:  
             dataset_path = cfg["tasks"][t]  
@@ -318,7 +320,7 @@ def main(argv: Iterable[str] | None = None) -> None:
     max_workers_count = 1 
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers_count) as executor:  
         future_to_task = {}  
-        print(f"[run] Submitting up to {max_workers_count} initial tasks, all tasks: {all_tasks} ")
+        #print(f"[run] Submitting up to {max_workers_count} initial tasks, all tasks: {all_tasks} ")
         # Submit the first batch of tasks (up to 1).  
         initial_task_count = min(max_workers_count, len(all_tasks))  
         for i in range(initial_task_count):  
