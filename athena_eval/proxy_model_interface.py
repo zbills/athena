@@ -203,7 +203,7 @@ class OpenAIProxyModelInterface():
                     "parallel_tool_calls": False,
                 }
                 #print(f"[generate_response_for_prompt_string] payload: {payload}")
-                inference_endpoint = f"https://openai-proxy.int.prod-southcentralus-hpe-2.dev.openai.org/v1/chat/completions"
+                inference_endpoint = self._inference_endpoint
                 # Make request
                 response = requests.post(
                     inference_endpoint,
