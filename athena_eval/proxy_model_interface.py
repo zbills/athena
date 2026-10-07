@@ -203,7 +203,7 @@ class OpenAIProxyModelInterface():
                     "parallel_tool_calls": False,
                 }
                 #print(f"[generate_response_for_prompt_string] payload: {payload}")
-                inference_endpoint = self._inference_endpoint
+                inference_endpoint = f"{self._inference_endpoint}/v1/chat/completions"
                 # Make request
                 response = requests.post(
                     inference_endpoint,
